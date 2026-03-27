@@ -78,6 +78,10 @@ const Puppy = sequelize.define('Puppy', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
   age: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -116,3 +120,78 @@ process.exit(1); // Exit with failure code
 
 //call startServer function to initialize server
 startServer();
+
+// CRUD OPERATIONS FOR PUPPIES 
+
+// GET all puppies 
+app.get('/puppies', async (req, res) => {
+    try {
+        const puppies = await Puppy.findAll();
+        res.json(puppies);
+    } catch (err) {
+        console.error('Error fetching puppies: ', err);
+        res.status(500).json({ error: 'Failed to fetch puppies' });
+    }
+});
+
+// GET a single puppy by ID
+app.get('/puppies/:id', async (req, res) => {
+    try {
+        const puppy = await Puppy.findByPk(req.params.id);
+        if (puppy) {
+            res.json(puppy);
+        } 
+        //server cannot be reached 
+        else {
+            res.status(404).json({ error: 'Puppy not found' });
+        }
+    } catch (err) {
+      // catch all 500 errors and log to console and return error message to client
+        console.error('Error fetching puppy: ', err);
+        res.status(500).json({ error: 'Failed to fetch puppy' });
+    }
+});
+
+// CREATE a new puppy
+app.post('/puppies', async (req, res) => {
+    try {
+        const { name, breed, age, user_id } = req.body;
+        const newPuppy = await Puppy.create({ name, breed, age, user_id });
+        res.status(201).json(newPuppy);
+    } catch (err) {
+        console.error('Error creating puppy: ', err);     
+        res.status(500).json({ error: 'Failed to create puppy' });  
+  } 
+});   
+
+// DELETE a puppy by ID 
+app.delete('/puppies/:id', async (req, res) => {
+    try {
+        const deleted = await Puppy.destroy({ where: { id: req.params.id } });
+        if (deleted) {
+            res.json({ message: 'Puppy deleted' });
+        } else {
+            res.status(404).json({ error: 'Puppy not found' });
+        }
+    } catch (err) {
+        console.error('Error deleting puppy: ', err);
+        res.status(500).json({ error: 'Failed to delete puppy' });
+    }
+});
+
+// Update puppy using PUT route
+app.put('/puppies/:id', async (req, res) => {
+    try {
+        const { name, breed, age, user_id } = req.body;
+        const [updated] = await Puppy.update({ name, breed, age, user_id }, { where: { id: req.params.id } });
+        if (updated) {
+            const updatedPuppy = await Puppy.findByPk(req.params.id);
+            res.json(updatedPuppy);
+        } else {
+            res.status(404).json({ error: 'Puppy not found' });
+        }
+    } catch (err) {
+        console.error('Error updating puppy: ', err);
+        res.status(500).json({ error: 'Failed to update puppy' });
+    }
+});
