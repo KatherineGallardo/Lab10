@@ -44,22 +44,27 @@ app.use(cors());
 app.use(express.json());
 
 //create Sequelize instance to connect to PostgreSQL database
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT) || 5432,
-  dialect: 'postgres',
-  dialectOptions: useSsl
-    ? {
+const sequelize = process.env.DATABASE_URL
+  ? new Sequelize(process.env.DATABASE_URL, {
+      dialect: 'postgres',
+      dialectOptions: {
         ssl: {
           require: true,
           rejectUnauthorized: false,
         },
-      }
-    : undefined,
-  define: {
-    schema: DB_SCHEMA,
-  },
-});
+      },
+      define: {
+        schema: DB_SCHEMA,
+      },
+    })
+  : new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT) || 5432,
+      dialect: 'postgres',
+      define: {
+        schema: DB_SCHEMA,
+      },
+    });
 
 // Sequelize model name Puppies
 const Puppy = sequelize.define('Puppy', {
