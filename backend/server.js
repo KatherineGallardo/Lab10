@@ -45,6 +45,7 @@ app.use(express.json());
 
 //create Sequelize instance to connect to PostgreSQL database
 const sequelize = process.env.DATABASE_URL
+// in order to be able to deploy, use DATABASE_URL from .env or from specified variable for deployment 
   ? new Sequelize(process.env.DATABASE_URL, {
       dialect: 'postgres',
       dialectOptions: {
@@ -57,6 +58,8 @@ const sequelize = process.env.DATABASE_URL
         schema: DB_SCHEMA,
       },
     })
+    // these were the variables that were used to connect database before we deployed 
+    //Since these variables were in the .env file, they will still work locally, but we need to use DATABASE_URL for deployment since that is what the hosting service provides for us to connect to the database
   : new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT) || 5432,
