@@ -7,7 +7,7 @@
 /* Header from Shopping Cart Vite Lab */ 
 .header{
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
   background-color: #BF5700;
@@ -16,6 +16,14 @@
   font-family: Arial, Helvetica, sans-serif;
 
 }
+
+/* Helps with spacing the sign in and sign out buttons */ 
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 
 .header h1 {
   margin: 0;
